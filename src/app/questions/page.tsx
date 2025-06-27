@@ -5,6 +5,7 @@ import { useState, useEffect } from 'react';
 export default function QuestionsPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [origin, setOrigin] = useState('');
   const [errors, setErrors] = useState<{[key: string]: string}>({});
   const [formData, setFormData] = useState({
     name: '',
@@ -13,11 +14,14 @@ export default function QuestionsPage() {
     message: ''
   });
 
-  // Check if redirected from FormSubmit success
+  // Check if redirected from FormSubmit success and set origin
   useEffect(() => {
-    const urlParams = new URLSearchParams(window.location.search);
-    if (urlParams.get('success') === 'true') {
-      setIsSubmitted(true);
+    if (typeof window !== 'undefined') {
+      setOrigin(window.location.origin);
+      const urlParams = new URLSearchParams(window.location.search);
+      if (urlParams.get('success') === 'true') {
+        setIsSubmitted(true);
+      }
     }
   }, []);
 
@@ -167,7 +171,7 @@ export default function QuestionsPage() {
                   method="POST"
                   onSubmit={handleSubmit}
                 >
-                  <input type="hidden" name="_next" value={`${window.location.origin}/questions?success=true`} />
+                  <input type="hidden" name="_next" value={`${origin}/questions?success=true`} />
                   <input type="hidden" name="_subject" value="New Question from Nic's Marketing Website" />
                   <div className="form-group">
                     <label htmlFor="name">Name *</label>
