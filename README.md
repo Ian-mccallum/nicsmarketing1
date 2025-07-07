@@ -1,6 +1,6 @@
-# Nic's Marketing - Next.js TypeScript SPA
+# Nics Marketing - Next.js TypeScript SPA
 
-A modern, single-page web application built with Next.js and TypeScript for Nic's Marketing agency. This app is designed to pre-qualify brand clients and convert website visitors into qualified leads.
+A modern, single-page web application built with Next.js and TypeScript for Nics Marketing agency. This app is designed to pre-qualify brand clients and convert website visitors into qualified leads.
 
 ## 🚀 Features
 
@@ -165,4 +165,4 @@ Built by a 17-year-old digital native who understands the language of tomorrow's
 
 ---
 
-**Note**: This is a single-page application designed to convert visitors into qualified leads for Nic's Marketing agency. The form submission currently points to a placeholder API endpoint that should be updated with your actual backend service. 
+**Note**: This is a single-page application designed to convert visitors into qualified leads for Nics Marketing agency. The form submission currently points to a placeholder API endpoint that should be updated with your actual backend service. 

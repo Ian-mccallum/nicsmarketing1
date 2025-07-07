@@ -103,7 +103,7 @@ export default function QuestionsPage() {
           <div className="logo-container">
             <img 
               src="/nmlogo.png" 
-              alt="Nic's Marketing" 
+              alt="Nics Marketing" 
               className="logo"
               onError={(e) => {
                 console.error('Logo failed to load');
@@ -172,7 +172,7 @@ export default function QuestionsPage() {
                   onSubmit={handleSubmit}
                 >
                   <input type="hidden" name="_next" value={`${origin}/questions?success=true`} />
-                  <input type="hidden" name="_subject" value="New Question from Nic's Marketing Website" />
+                  <input type="hidden" name="_subject" value="New Question from Nics Marketing Website" />
                   <div className="form-group">
                     <label htmlFor="name">Name *</label>
                     <input

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import Select from 'react-select';
 
 interface QuizData {
   businessName: string;
@@ -57,6 +58,8 @@ const INDUSTRY_OPTIONS = [
   "Other"
 ];
 
+const INDUSTRY_SELECT_OPTIONS = INDUSTRY_OPTIONS.map(option => ({ value: option, label: option }));
+
 const REVENUE_OPTIONS = [
   "None",
   "$100-$499",
@@ -66,6 +69,8 @@ const REVENUE_OPTIONS = [
   "$5,000+"
 ];
 
+const REVENUE_SELECT_OPTIONS = REVENUE_OPTIONS.map(option => ({ value: option, label: option }));
+
 const AD_SPEND_OPTIONS = [
   "None",
   "$25-$150",
@@ -73,6 +78,8 @@ const AD_SPEND_OPTIONS = [
   "$500-$1,000", 
   "$1,000+"
 ];
+
+const AD_SPEND_SELECT_OPTIONS = AD_SPEND_OPTIONS.map(option => ({ value: option, label: option }));
 
 const CHALLENGE_OPTIONS = [
   "Low conversion rates",
@@ -500,17 +507,69 @@ export default function QuizPage() {
 
             <div className="form-group">
               <label htmlFor="industry">What industry are you in? *</label>
-              <select
-                id="industry"
-                value={quizData.industry}
-                onChange={(e) => handleInputChange('industry', e.target.value)}
+              <Select
+                inputId="industry"
+                options={INDUSTRY_SELECT_OPTIONS}
+                value={INDUSTRY_SELECT_OPTIONS.find(opt => opt.value === quizData.industry) || null}
+                onChange={opt => handleInputChange('industry', opt ? opt.value : '')}
+                placeholder="Select your industry"
+                styles={{
+                  control: (provided, state) => ({
+                    ...provided,
+                    backgroundColor: 'rgba(255,255,255,0.05)',
+                    color: '#fff',
+                    borderColor: state.isFocused ? 'rgba(255,255,255,0.3)' : 'rgba(255,255,255,0.15)',
+                    boxShadow: 'none',
+                    minHeight: '45px',
+                    fontSize: '1rem',
+                    fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
+                  }),
+                  singleValue: (provided) => ({
+                    ...provided,
+                    color: '#fff',
+                    fontSize: '1rem',
+                    fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
+                  }),
+                  menu: (provided) => ({
+                    ...provided,
+                    backgroundColor: '#fff',
+                    color: '#111',
+                    fontSize: '1rem',
+                    fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
+                  }),
+                  option: (provided, state) => ({
+                    ...provided,
+                    color: '#111',
+                    backgroundColor: state.isFocused ? '#eee' : '#fff',
+                    fontSize: '1rem',
+                    fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
+                  }),
+                  placeholder: (provided) => ({
+                    ...provided,
+                    color: 'rgba(255,255,255,0.5)',
+                    fontSize: '1rem',
+                    fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
+                  }),
+                  input: (provided) => ({
+                    ...provided,
+                    color: '#fff',
+                    fontSize: '1rem',
+                    fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
+                  }),
+                }}
+                theme={theme => ({
+                  ...theme,
+                  borderRadius: 8,
+                  colors: {
+                    ...theme.colors,
+                    primary25: '#eee',
+                    primary: 'rgba(255,255,255,0.3)',
+                    neutral0: '#fff',
+                    neutral80: '#111',
+                  },
+                })}
                 required
-              >
-                <option value="">Select your industry</option>
-                {INDUSTRY_OPTIONS.map((option) => (
-                  <option key={option} value={option}>{option}</option>
-                ))}
-              </select>
+              />
             </div>
 
             <div className="form-group">
@@ -533,32 +592,136 @@ export default function QuizPage() {
             
             <div className="form-group">
               <label htmlFor="currentRevenue">What's your current monthly revenue? *</label>
-              <select
-                id="currentRevenue"
-                value={quizData.currentRevenue}
-                onChange={(e) => handleInputChange('currentRevenue', e.target.value)}
+              <Select
+                inputId="currentRevenue"
+                options={REVENUE_SELECT_OPTIONS}
+                value={REVENUE_SELECT_OPTIONS.find(opt => opt.value === quizData.currentRevenue) || null}
+                onChange={opt => handleInputChange('currentRevenue', opt ? opt.value : '')}
+                placeholder="Select your revenue range"
+                styles={{
+                  control: (provided, state) => ({
+                    ...provided,
+                    backgroundColor: 'rgba(255,255,255,0.05)',
+                    color: '#fff',
+                    borderColor: state.isFocused ? 'rgba(255,255,255,0.3)' : 'rgba(255,255,255,0.15)',
+                    boxShadow: 'none',
+                    minHeight: '45px',
+                    fontSize: '1rem',
+                    fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
+                  }),
+                  singleValue: (provided) => ({
+                    ...provided,
+                    color: '#fff',
+                    fontSize: '1rem',
+                    fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
+                  }),
+                  menu: (provided) => ({
+                    ...provided,
+                    backgroundColor: '#fff',
+                    color: '#111',
+                    fontSize: '1rem',
+                    fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
+                  }),
+                  option: (provided, state) => ({
+                    ...provided,
+                    color: '#111',
+                    backgroundColor: state.isFocused ? '#eee' : '#fff',
+                    fontSize: '1rem',
+                    fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
+                  }),
+                  placeholder: (provided) => ({
+                    ...provided,
+                    color: 'rgba(255,255,255,0.5)',
+                    fontSize: '1rem',
+                    fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
+                  }),
+                  input: (provided) => ({
+                    ...provided,
+                    color: '#fff',
+                    fontSize: '1rem',
+                    fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
+                  }),
+                }}
+                theme={theme => ({
+                  ...theme,
+                  borderRadius: 8,
+                  colors: {
+                    ...theme.colors,
+                    primary25: '#eee',
+                    primary: 'rgba(255,255,255,0.3)',
+                    neutral0: '#fff',
+                    neutral80: '#111',
+                  },
+                })}
                 required
-              >
-                <option value="">Select revenue range</option>
-                {REVENUE_OPTIONS.map((option) => (
-                  <option key={option} value={option}>{option}</option>
-                ))}
-              </select>
+              />
             </div>
 
             <div className="form-group">
               <label htmlFor="adSpend">What's your current monthly ad spend? *</label>
-              <select
-                id="adSpend"
-                value={quizData.adSpend}
-                onChange={(e) => handleInputChange('adSpend', e.target.value)}
+              <Select
+                inputId="adSpend"
+                options={AD_SPEND_SELECT_OPTIONS}
+                value={AD_SPEND_SELECT_OPTIONS.find(opt => opt.value === quizData.adSpend) || null}
+                onChange={opt => handleInputChange('adSpend', opt ? opt.value : '')}
+                placeholder="Select your ad spend range"
+                styles={{
+                  control: (provided, state) => ({
+                    ...provided,
+                    backgroundColor: 'rgba(255,255,255,0.05)',
+                    color: '#fff',
+                    borderColor: state.isFocused ? 'rgba(255,255,255,0.3)' : 'rgba(255,255,255,0.15)',
+                    boxShadow: 'none',
+                    minHeight: '45px',
+                    fontSize: '1rem',
+                    fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
+                  }),
+                  singleValue: (provided) => ({
+                    ...provided,
+                    color: '#fff',
+                    fontSize: '1rem',
+                    fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
+                  }),
+                  menu: (provided) => ({
+                    ...provided,
+                    backgroundColor: '#fff',
+                    color: '#111',
+                    fontSize: '1rem',
+                    fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
+                  }),
+                  option: (provided, state) => ({
+                    ...provided,
+                    color: '#111',
+                    backgroundColor: state.isFocused ? '#eee' : '#fff',
+                    fontSize: '1rem',
+                    fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
+                  }),
+                  placeholder: (provided) => ({
+                    ...provided,
+                    color: 'rgba(255,255,255,0.5)',
+                    fontSize: '1rem',
+                    fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
+                  }),
+                  input: (provided) => ({
+                    ...provided,
+                    color: '#fff',
+                    fontSize: '1rem',
+                    fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
+                  }),
+                }}
+                theme={theme => ({
+                  ...theme,
+                  borderRadius: 8,
+                  colors: {
+                    ...theme.colors,
+                    primary25: '#eee',
+                    primary: 'rgba(255,255,255,0.3)',
+                    neutral0: '#fff',
+                    neutral80: '#111',
+                  },
+                })}
                 required
-              >
-                <option value="">Select ad spend range</option>
-                {AD_SPEND_OPTIONS.map((option) => (
-                  <option key={option} value={option}>{option}</option>
-                ))}
-              </select>
+              />
             </div>
           </div>
         );
@@ -664,7 +827,7 @@ export default function QuizPage() {
             <div className="logo-container">
               <img 
                 src="/nmlogo.png" 
-                alt="Nic's Marketing" 
+                alt="Nics Marketing" 
                 className="logo"
                 onError={(e) => {
                   console.error('Logo failed to load');
@@ -802,7 +965,7 @@ export default function QuizPage() {
           <div className="logo-container">
             <img 
               src="/nmlogo.png" 
-              alt="Nic's Marketing" 
+              alt="Nics Marketing" 
               className="logo"
               onError={(e) => {
                 console.error('Logo failed to load');

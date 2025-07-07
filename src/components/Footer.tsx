@@ -13,7 +13,7 @@ export default function Footer() {
               <div className="footer-logo">
                 <img 
                   src="/nics.-2-removebg-preview.png" 
-                  alt="Nic's Marketing" 
+                  alt="Nics Marketing" 
                   className="footer-logo-img"
                   onError={(e) => {
                     console.error('Footer logo failed to load');
@@ -79,7 +79,7 @@ export default function Footer() {
           <div className="footer-bottom">
             <div className="footer-divider"></div>
             <div className="footer-bottom-content">
-              <p>&copy; 2025 Nic's Marketing. All rights reserved.</p>
+              <p>&copy; 2025 Nics Marketing. All rights reserved.</p>
               <div className="footer-legal">
                 <Link href="/privacy" className="footer-link">Privacy Policy</Link>
                 <Link href="/terms" className="footer-link">Terms of Service</Link>

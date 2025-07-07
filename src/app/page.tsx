@@ -153,7 +153,7 @@ export default function Home() {
           <div className="logo-container">
             <img 
               src="/nmlogo.png" 
-              alt="Nic's Marketing" 
+              alt="Nics Marketing" 
               className="logo"
               onError={(e) => {
                 console.error('Logo failed to load');
@@ -170,10 +170,12 @@ export default function Home() {
           <div className="hero-content">
             <div className="hero-text">
               <h1 className="text-gradient">Stop Chasing Clients. Become the Brand They Chase.</h1>
-              <p>Apply to Work with Nic's Marketing to transform your Ecommerce Businesses conversions.</p>
-              <button className="btn" onClick={scrollToForm}>
-                Reserve My Spot
-                <span className="btn-arrow">↓</span>
+              <p>Apply to Work with Nics Marketing to transform your Ecommerce Businesses conversions.</p>
+              <button className="btn btn-light-sweep" onClick={scrollToForm}>
+                <span style={{ fontWeight: '600' }}>Reserve My Spot</span>
+                <svg className="btn-arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M12 5V19M12 19L19 12M12 19L5 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
               </button>
             </div>
             <div className="hero-visual">
@@ -219,7 +221,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Meet Nico */}
+      {/* Meet Villa */}
       <section className="fade-in-up meet-nico-hero">
         <div className="container">
           <div className="meet-nico-content">
@@ -232,17 +234,17 @@ export default function Home() {
                       <path d="M20.5899 22C20.5899 18.13 16.7399 15 11.9999 15C7.25991 15 3.40991 18.13 3.40991 22" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                     </svg>
                   </div>
-                  <h2 className="text-gradient">Meet Nico</h2>
+                  <h2 className="text-gradient">Meet Villa</h2>
                 </div>
                 
                 {/* Photo moved here for mobile-first layout */}
                 <div className="meet-nico-photo">
                   <img 
                     src="/IMG_8367.JPG" 
-                    alt="Nico" 
+                    alt="Villa" 
                     className="nico-photo"
                     onError={(e) => {
-                      console.error('Nico photo failed to load');
+                      console.error('Villa photo failed to load');
                       e.currentTarget.style.display = 'none';
                     }}
                   />
@@ -287,10 +289,10 @@ export default function Home() {
                 <div className="meet-nico-photo">
                   <img 
                     src="/IMG_8367.JPG" 
-                    alt="Nico" 
+                    alt="Villa" 
                     className="nico-photo"
                     onError={(e) => {
-                      console.error('Nico photo failed to load');
+                      console.error('Villa photo failed to load');
                       e.currentTarget.style.display = 'none';
                     }}
                   />

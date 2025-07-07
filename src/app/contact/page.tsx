@@ -26,7 +26,7 @@ export default function ContactPage() {
           <div className="logo-container">
             <img 
               src="/nmlogo.png" 
-              alt="Nic's Marketing" 
+              alt="Nics Marketing" 
               className="logo"
               onError={(e) => {
                 console.error('Logo failed to load');

@@ -1,7 +1,7 @@
 # React TypeScript SPA - Project Outline
 
 ## 📋 Overview
-A complete React single-page application built with TypeScript for Nic's Marketing agency. The app is designed to pre-qualify brand clients and convert website visitors into qualified leads.
+A complete React single-page application built with TypeScript for Nics Marketing agency. The app is designed to pre-qualify brand clients and convert website visitors into qualified leads.
 
 ## 🏗️ Project Structure
 
