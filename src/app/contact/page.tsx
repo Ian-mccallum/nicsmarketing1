@@ -50,7 +50,19 @@ export default function ContactPage() {
             <p>Ready to transform your brand? Let's hop on a phone call and discuss how we can take your business to the next level.</p>
           </div>
 
-          <div className="contact-grid">
+          {/* Calendly Widget - Now at the top */}
+          <div className="calendly-section">
+            <div className="calendly-container">
+              <div 
+                className="calendly-inline-widget" 
+                data-url="https://calendly.com/nicsmarketing1/30min?background_color=000000&text_color=ffffff&primary_color=c3c3c3"
+                style={{ minWidth: '320px', height: '700px' }}
+              />
+            </div>
+          </div>
+
+          {/* Information Cards - Now below Calendly */}
+          <div className="contact-info-section">
             <div className="contact-info">
               <div className="info-card">
                 <div className="info-icon">
@@ -86,14 +98,6 @@ export default function ContactPage() {
                   <li>Start your transformation journey</li>
                 </ul>
               </div>
-            </div>
-
-            <div className="calendly-container">
-              <div 
-                className="calendly-inline-widget" 
-                data-url="https://calendly.com/nicsmarketing1/30min?background_color=000000&text_color=ffffff&primary_color=c3c3c3"
-                style={{ minWidth: '320px', height: '700px' }}
-              />
             </div>
           </div>
 
