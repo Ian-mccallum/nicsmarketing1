@@ -222,31 +222,66 @@ export default function QuizPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [qualificationScore, setQualificationScore] = useState(0);
   const [isQualified, setIsQualified] = useState(false);
+  const [isTransitioning, setIsTransitioning] = useState(false);
+  const [showScrollTop, setShowScrollTop] = useState(false);
+  const [emailError, setEmailError] = useState('');
 
   // Instant scroll to top function
+  // Smooth scroll to top with better UX
   const scrollToTop = () => {
-    window.scrollTo(0, 0);
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth'
+    });
   };
 
   // Auto scroll to top when component mounts or completion state changes
   useEffect(() => {
     if (isCompleted) {
-      scrollToTop();
+      // Small delay to ensure content is rendered
+      setTimeout(() => {
+        scrollToTop();
+      }, 100);
     }
   }, [isCompleted]);
 
   // Auto scroll to top when step changes
   useEffect(() => {
     if (currentStep >= 0) {
-      scrollToTop();
+      // Small delay to ensure content is rendered
+      setTimeout(() => {
+        scrollToTop();
+      }, 100);
+    }
+    
+    // Clear email error when navigating away from email step
+    if (currentStep !== 4) {
+      setEmailError('');
     }
   }, [currentStep]);
+
+  // Scroll listener for scroll-to-top button
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+      setShowScrollTop(scrollTop > 300);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   const handleInputChange = (field: keyof QuizData, value: string | string[]) => {
     setQuizData(prev => ({
       ...prev,
       [field]: value
     }));
+    
+    // Validate email in real-time
+    if (field === 'email') {
+      const error = validateEmail(value as string);
+      setEmailError(error);
+    }
   };
 
   const handleChallengeToggle = (challenge: string) => {
@@ -258,11 +293,38 @@ export default function QuizPage() {
     }));
   };
 
+  // Email validation function
+  const validateEmail = (email: string) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!email) {
+      return 'Email is required';
+    }
+    if (!emailRegex.test(email)) {
+      return 'Please enter a valid email address';
+    }
+    return '';
+  };
+
   const nextStep = () => {
+    // Validate email before proceeding on the last step
+    if (currentStep === 4) {
+      const emailValidationError = validateEmail(quizData.email);
+      if (emailValidationError) {
+        setEmailError(emailValidationError);
+        return;
+      }
+    }
+    
     if (currentStep < QUIZ_STEPS.length - 1) {
-      setCurrentStep(prev => prev + 1);
-      // Instant scroll to top
-      window.scrollTo(0, 0);
+      setIsTransitioning(true);
+      setTimeout(() => {
+        setCurrentStep(prev => prev + 1);
+        setIsTransitioning(false);
+        // Smooth scroll to top with delay for better UX
+        setTimeout(() => {
+          scrollToTop();
+        }, 100);
+      }, 150);
     } else {
       // Calculate qualification score when completing the quiz
       const score = calculateQualificationScore(quizData);
@@ -270,16 +332,24 @@ export default function QuizPage() {
       setQualificationScore(score);
       setIsQualified(result.qualified);
       setIsCompleted(true);
-      // Instant scroll to top for results
-      window.scrollTo(0, 0);
+      // Smooth scroll to top for results
+      setTimeout(() => {
+        scrollToTop();
+      }, 200);
     }
   };
 
   const prevStep = () => {
     if (currentStep > 0) {
-      setCurrentStep(prev => prev - 1);
-      // Instant scroll to top
-      window.scrollTo(0, 0);
+      setIsTransitioning(true);
+      setTimeout(() => {
+        setCurrentStep(prev => prev - 1);
+        setIsTransitioning(false);
+        // Smooth scroll to top with delay for better UX
+        setTimeout(() => {
+          scrollToTop();
+        }, 100);
+      }, 150);
     }
   };
 
@@ -299,81 +369,116 @@ export default function QuizPage() {
 
   // Points system for qualification
   const calculateQualificationScore = (data: QuizData) => {
-    let score = 0;
-    
-    // Industry scoring (0-10 points)
-    const industryScores: { [key: string]: number } = {
-      "Clothing Brand": 10,
-      "Fashion/Beauty": 10,
-      "Tech/Gadgets": 10,
-      "Health/Wellness": 10,
-      "Home/Lifestyle": 10,
-      "Food/Beverage": 10,
-      "Sports/Fitness": 10,
-      "Service Business": 10,
-      "Digital Products": 10,
-      "Other": 10,
-      "SaaS/Software": 5 // Less favorable
-    };
-    score += industryScores[data.industry] || 0;
-    
-    // Website scoring (0-15 points)
-    if (!data.websiteUrl || data.websiteUrl.trim() === '') {
-      score += 10; // No website
-    } else {
-      score += 15; // Has website
+    // Auto-decline for high revenue businesses
+    if (data.currentRevenue === "$5,000+") {
+      return 0; // Auto-decline
     }
     
-    // Revenue scoring (0-25 points)
+    // Calculate individual category scores (0-100 scale for each)
+    let revenueScore = 0;
+    let adSpendScore = 0;
+    let challengeScore = 0;
+    
+    // Revenue scoring (0-100 points) - Sweet spot is $100-$1000
     const revenueScores: { [key: string]: number } = {
-      "None": 25,
-      "$100-$499": 20,
-      "$500-$999": 20,
-      "$1,000-$2,500": 10, // Medium favorable
-      "$2,500-$5,000": 5, // Medium favorable
-      "$5,000+": 5 // Much less favorable
+      "None": 85, // High potential, no existing revenue
+      "$100-$499": 100, // Perfect sweet spot
+      "$500-$999": 95, // Great fit
+      "$1,000-$2,500": 70, // Good but higher bar
+      "$2,500-$5,000": 40, // Selective - need strong other factors
+      "$5,000+": 0 // Auto-decline
     };
-    score += revenueScores[data.currentRevenue] || 0;
+    revenueScore = revenueScores[data.currentRevenue] || 0;
     
-    // Ad spend scoring (0-25 points)
+    // Ad spend scoring (0-100 points) - Lower is better
     const adSpendScores: { [key: string]: number } = {
-      "None": 25, // Highest favorable
-      "$25-$150": 20, // High favorability
-      "$150-$500": 10, // Decent
-      "$500-$1,000": 5, // Lower favorable
-      "$1,000+": 0 // Lower favorable
+      "None": 100, // Perfect - no ad spend means room for growth
+      "$25-$150": 90, // Excellent - low ad spend
+      "$150-$500": 70, // Good - moderate ad spend
+      "$500-$1,000": 40, // Acceptable but higher bar
+      "$1,000+": 20 // Lower priority - already spending significantly
     };
-    score += adSpendScores[data.adSpend] || 0;
+    adSpendScore = adSpendScores[data.adSpend] || 0;
     
-    // Barriers scoring (0-20 points) - More barriers = more points
-    const barrierScores: { [key: string]: number } = {
-      "Low conversion rates": 7, // Highest
-      "Low traffic": 7, // Highest
-      "Poor engagement": 7, // Highest
-      "High customer acquisition cost": 6,
-      "Inconsistent results": 6,
-      "Scaling effectively": 5,
-      "Brand awareness": 6,
-      "Competition": 6,
-      "No clear strategy": 5,
-      "Budget constraints": 1
+    // Challenge scoring (0-100 points) - More challenges = better fit
+    const challengeScores: { [key: string]: number } = {
+      "Low conversion rates": 25, // High value challenge
+      "Low traffic": 25, // High value challenge
+      "Poor engagement": 20, // High value challenge
+      "High customer acquisition cost": 20, // High value challenge
+      "Inconsistent results": 18, // Good challenge
+      "Brand awareness": 18, // Good challenge
+      "Competition": 15, // Moderate challenge
+      "Scaling effectively": 15, // Moderate challenge
+      "No clear strategy": 12, // Moderate challenge
+      "Budget constraints": 5 // Lower value challenge
     };
     
-    data.challenges.forEach(challenge => {
-      score += barrierScores[challenge] || 0;
-    });
-    
-    // Cap barriers at 20 points
-    const barrierPoints = data.challenges.reduce((total, challenge) => {
-      return total + (barrierScores[challenge] || 0);
+    // Calculate challenge score with bonuses for multiple challenges
+    const challengePoints = data.challenges.reduce((total, challenge) => {
+      return total + (challengeScores[challenge] || 0);
     }, 0);
-    score += Math.min(barrierPoints, 20);
     
-    return score;
+    // Apply challenge bonuses
+    let challengeMultiplier = 1.0;
+    if (data.challenges.length >= 5) {
+      challengeMultiplier = 1.4; // 40% bonus for 5+ challenges
+    } else if (data.challenges.length >= 3) {
+      challengeMultiplier = 1.2; // 20% bonus for 3+ challenges
+    }
+    
+    challengeScore = Math.min(challengePoints * challengeMultiplier, 100);
+    
+    // Calculate weighted base score (45% revenue, 25% ad spend, 30% challenges)
+    const baseScore = (revenueScore * 0.45) + (adSpendScore * 0.25) + (challengeScore * 0.30);
+    
+    // Apply ad spend multiplier (lower ad spend gets bonus)
+    let adSpendMultiplier = 1.0;
+    if (data.adSpend === "None") {
+      adSpendMultiplier = 1.3; // 30% bonus for no ad spend
+    } else if (data.adSpend === "$25-$150") {
+      adSpendMultiplier = 1.2; // 20% bonus for low ad spend
+    } else if (data.adSpend === "$150-$500") {
+      adSpendMultiplier = 1.1; // 10% bonus for moderate ad spend
+    }
+    
+    // Calculate final adjusted score
+    const adjustedScore = baseScore * adSpendMultiplier;
+    
+    return Math.min(adjustedScore, 100); // Cap at 100
   };
 
   const getQualificationResult = (score: number, businessName: string, personName: string, quizData: QuizData) => {
-    if (score >= 70) {
+    // Auto-decline for $5,000+ revenue
+    if (quizData.currentRevenue === "$5,000+") {
+      return {
+        qualified: false,
+        message: `Thanks for your interest ${personName}, but ${businessName} appears to be too established for my services.`,
+        nextSteps: "I specialize in helping businesses scale from $100-$5,000 monthly revenue. Your business is already beyond this range.",
+        services: null,
+        painPointSolutions: null,
+        revenueGuarantee: null,
+        showContactOption: true
+      };
+    }
+    
+    // Adaptive thresholds based on revenue and challenges
+    let baseThreshold = 70; // Default threshold
+    
+    // Adjust threshold based on revenue range
+    if (quizData.currentRevenue === "$100-$499" || quizData.currentRevenue === "$500-$999") {
+      baseThreshold = 60; // Lower threshold for sweet spot revenue
+    } else if (quizData.currentRevenue === "$1,000-$2,500") {
+      baseThreshold = 70; // Standard threshold
+    } else if (quizData.currentRevenue === "$2,500-$5,000") {
+      baseThreshold = 80; // Higher threshold for higher revenue
+    }
+    
+    // Reduce threshold based on number of challenges (more challenges = easier to qualify)
+    const challengeReduction = Math.min(quizData.challenges.length * 3, 15); // Max 15 point reduction
+    const adjustedThreshold = baseThreshold - challengeReduction;
+    
+    if (score >= adjustedThreshold) {
       const services = getRecommendedServices(quizData);
       const painPointSolutions = getPainPointSolutions(quizData.challenges);
       const revenueGuarantee = getRevenueGuarantee(quizData.currentRevenue);
@@ -386,7 +491,7 @@ export default function QuizPage() {
         painPointSolutions: painPointSolutions,
         revenueGuarantee: revenueGuarantee
       };
-    } else if (score >= 50) {
+    } else if (score >= adjustedThreshold - 15) { // 15 point buffer for "maybe" category
       const services = getRecommendedServices(quizData);
       const painPointSolutions = getPainPointSolutions(quizData.challenges);
       const revenueGuarantee = getLowerRevenueGuarantee(quizData.currentRevenue);
@@ -797,8 +902,14 @@ export default function QuizPage() {
                 placeholder="Enter your email address"
                 value={quizData.email}
                 onChange={(e) => handleInputChange('email', e.target.value)}
+                className={emailError ? 'error' : ''}
                 required
               />
+              {emailError && (
+                <div className="error-message">
+                  {emailError}
+                </div>
+              )}
             </div>
           </div>
         );
@@ -947,11 +1058,24 @@ export default function QuizPage() {
                 Back to Home
               </Link>
             </div>
-          </div>
-        </div>
+                  </div>
       </div>
-    );
-  }
+      
+      {/* Scroll to top button */}
+      {showScrollTop && (
+        <button 
+          onClick={scrollToTop}
+          className="scroll-to-top-btn"
+          aria-label="Scroll to top"
+        >
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M18 15L12 9L6 15" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
+        </button>
+      )}
+    </div>
+  );
+}
 
   return (
     <div className="quiz-page">
@@ -994,7 +1118,7 @@ export default function QuizPage() {
         </div>
 
         <div className="quiz-content">
-          <div className="question-card">
+          <div className={`question-card ${isTransitioning ? 'fade-out' : 'fade-in'}`}>
             <div className="step-header">
               <h2>{QUIZ_STEPS[currentStep].title}</h2>
               <p>{QUIZ_STEPS[currentStep].description}</p>
@@ -1004,7 +1128,7 @@ export default function QuizPage() {
 
             <div className="step-navigation">
               {currentStep > 0 && (
-                <button onClick={prevStep} className="btn btn-secondary">
+                <button onClick={prevStep} className="btn btn-secondary" disabled={isTransitioning}>
                   ← Previous
                 </button>
               )}
@@ -1012,10 +1136,11 @@ export default function QuizPage() {
                 onClick={nextStep}
                 className="btn btn-primary"
                 disabled={
+                  isTransitioning ||
                   (currentStep === 0 && (!quizData.businessName || !quizData.industry)) ||
                   (currentStep === 1 && (!quizData.currentRevenue || !quizData.adSpend)) ||
                   (currentStep === 3 && !quizData.timeline) ||
-                  (currentStep === 4 && (!quizData.name || !quizData.email))
+                  (currentStep === 4 && (!quizData.name || !quizData.email || !!emailError))
                 }
               >
                 {currentStep === QUIZ_STEPS.length - 1 ? 'Complete Assessment' : 'Next Step →'}

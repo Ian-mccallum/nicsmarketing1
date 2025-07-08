@@ -299,7 +299,7 @@ export default function Home() {
                 </div>
                 <div className="meet-nico-cta-card">
                   <p className="meet-nico-cta">
-                    <strong>Ready to work with someone who speaks the language of tomorrow's consumers?</strong>
+                    Ready to work with someone who speaks the language of tomorrow's consumers?
                   </p>
                 </div>
               </div>
@@ -309,7 +309,7 @@ export default function Home() {
             <div className="meet-nico-desktop-cta">
               <div className="meet-nico-cta-card-wide">
                 <p className="meet-nico-cta">
-                  <strong>Ready to work with someone who speaks the language of tomorrow's consumers?</strong>
+                  Ready to work with someone who speaks the language of tomorrow's consumers?
                 </p>
               </div>
             </div>
