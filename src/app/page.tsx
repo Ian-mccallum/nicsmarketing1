@@ -169,7 +169,7 @@ export default function Home() {
         <div className="container">
           <div className="hero-content">
             <div className="hero-text">
-              <h1 className="text-gradient">Stop Chasing pes. Become the Brand They Chase.</h1>
+              <h1 className="text-gradient">Stop Chasing Clients. Become the Brand They Chase.</h1>
               <p>Apply to Work with Nics Marketing to transform your Ecommerce Businesses conversions.</p>
               <button className="btn btn-light-sweep" onClick={scrollToForm}>
                 <span style={{ fontWeight: '600' }}>Reserve My Spot</span>
