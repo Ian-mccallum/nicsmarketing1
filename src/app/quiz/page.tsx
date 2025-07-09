@@ -700,6 +700,7 @@ export default function QuizPage() {
                 value={INDUSTRY_SELECT_OPTIONS.find(opt => opt.value === quizData.industry) || null}
                 onChange={opt => handleInputChange('industry', opt ? opt.value : '')}
                 placeholder="Select your industry"
+                isSearchable={false}
                 styles={{
                   control: (provided, state) => ({
                     ...provided,
@@ -785,6 +786,7 @@ export default function QuizPage() {
                 value={REVENUE_SELECT_OPTIONS.find(opt => opt.value === quizData.currentRevenue) || null}
                 onChange={opt => handleInputChange('currentRevenue', opt ? opt.value : '')}
                 placeholder="Select your revenue range"
+                isSearchable={false}
                 styles={{
                   control: (provided, state) => ({
                     ...provided,
@@ -852,6 +854,7 @@ export default function QuizPage() {
                 value={AD_SPEND_SELECT_OPTIONS.find(opt => opt.value === quizData.adSpend) || null}
                 onChange={opt => handleInputChange('adSpend', opt ? opt.value : '')}
                 placeholder="Select your ad spend range"
+                isSearchable={false}
                 styles={{
                   control: (provided, state) => ({
                     ...provided,
