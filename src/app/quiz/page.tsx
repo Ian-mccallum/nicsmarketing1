@@ -20,7 +20,7 @@ const QUIZ_STEPS = [
   {
     id: 'brand-profile',
     title: 'Brand Profile',
-    description: 'Tell us about your business'
+    description: 'Tell me about your business'
   },
   {
     id: 'budget-scale',
@@ -678,7 +678,7 @@ export default function QuizPage() {
       case 0: // Brand Profile
         return (
           <div className="step-content">
-            <h2>Tell us about your business</h2>
+            <h2>Tell me about your business</h2>
             
             <div className="form-group">
               <label htmlFor="businessName">Business Name *</label>
