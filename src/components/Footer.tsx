@@ -81,8 +81,8 @@ export default function Footer() {
             <div className="footer-bottom-content">
               <p>&copy; 2025 Nics Marketing. All rights reserved.</p>
               <div className="footer-legal">
-                <Link href="/privacy" className="footer-link">Privacy Policy</Link>
-                <Link href="/terms" className="footer-link">Terms of Service</Link>
+                <Link href="/policies" className="footer-link">Privacy Policy</Link>
+                <Link href="/policies" className="footer-link">Terms of Service</Link>
               </div>
             </div>
           </div>
