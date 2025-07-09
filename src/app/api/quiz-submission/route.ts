@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-const WEBHOOK_URL = process.env.NEXT_PUBLIC_WEBHOOK_URL || 'https://hook.us2.make.com/za6hy7vu588fcgad8zdnqhrcl8so435k';
+const WEBHOOK_URL = process.env.WEBHOOK_URL || process.env.NEXT_PUBLIC_WEBHOOK_URL || 'https://hook.us2.make.com/za6hy7vu588fcgad8zdnqhrcl8so435k';
 
 export async function POST(request: NextRequest) {
   console.log('🔵 API route called');
@@ -11,6 +11,8 @@ export async function POST(request: NextRequest) {
     console.log('🔵 Received quiz data:', Object.keys(quizData));
     console.log('🔵 Qualification status:', quizData.isQualified ? '✅ QUALIFIED' : '❌ NOT QUALIFIED');
     console.log('🔵 Qualification score:', quizData.qualificationScore);
+    console.log('🔵 Qualification message:', quizData.qualificationMessage);
+    console.log('🔵 Next steps:', quizData.nextSteps);
     console.log('🔵 Challenges array:', quizData.challenges);
     console.log('🔵 Challenges text:', quizData.challengesText);
     console.log('🔵 Challenges count:', quizData.challengesCount);

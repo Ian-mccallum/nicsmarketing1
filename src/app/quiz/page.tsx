@@ -333,6 +333,9 @@ export default function QuizPage() {
       setIsQualified(result.qualified);
       setIsCompleted(true);
       
+      console.log('🟡 Quiz completed - Score:', score, 'Qualified:', result.qualified);
+      console.log('🟡 Qualification message:', result.message);
+      
       // Send quiz data to webhook in background (completely non-blocking)
       const webhookData = {
         ...quizData,
@@ -384,33 +387,7 @@ export default function QuizPage() {
     }
   };
 
-  const handleSubmit = async () => {
-    setIsSubmitting(true);
-    
-    console.log('🟡 Quiz submit called');
-    console.log('🟡 Quiz data:', quizData);
-    
-    // Send quiz data to webhook in background (completely non-blocking)
-    fetch('/api/quiz-submission', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(quizData)
-    }).then(response => {
-      console.log('🟡 API response status:', response.status);
-      return response.json();
-    }).then(data => {
-      console.log('🟡 API response data:', data);
-    }).catch((error) => {
-      console.error('🟡 API error:', error);
-    });
-    
-    // Continue with normal flow immediately (no delay)
-    setTimeout(() => {
-      setIsSubmitting(false);
-    }, 1000);
-  };
+
 
   const progress = ((currentStep + 1) / QUIZ_STEPS.length) * 100;
   const isHalfway = currentStep === 2; // Step 3 of 5 (0-indexed, so step 2)
