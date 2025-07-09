@@ -5,7 +5,7 @@ import '../../styles/globals.css';
 const privacyPolicy = (
     <div>
     <h1>Privacy Policy</h1>
-    <p><strong>Effective Date:</strong> [Insert Date]</p>
+    <p><strong>Effective Date:</strong> july 9, 2025</p>
     <p>
       Nics Marketing ("we," "our," or "us") is committed to protecting your privacy. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you visit our website at nicsmarketing.co ("the Website") and use our services.
     </p>
