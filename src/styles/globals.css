@@ -4406,3 +4406,27 @@ li::before {
     font-size: 0.95rem;
   }
 }
+
+/* Homepage lowercase text style */
+.homepage-lowercase {
+  text-transform: lowercase !important;
+}
+
+.homepage-lowercase h1,
+.homepage-lowercase h2,
+.homepage-lowercase h3,
+.homepage-lowercase h4,
+.homepage-lowercase h5,
+.homepage-lowercase h6,
+.homepage-lowercase p,
+.homepage-lowercase span,
+.homepage-lowercase div,
+.homepage-lowercase button,
+.homepage-lowercase a,
+.homepage-lowercase label,
+.homepage-lowercase input,
+.homepage-lowercase textarea,
+.homepage-lowercase select,
+.homepage-lowercase li {
+  text-transform: lowercase !important;
+}

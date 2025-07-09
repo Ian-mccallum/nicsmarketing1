@@ -221,7 +221,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Meet Villa */}
+      {/* Meet Nico Villa */}
       <section className="fade-in-up meet-nico-hero">
         <div className="container">
           <div className="meet-nico-content">
@@ -234,7 +234,7 @@ export default function Home() {
                       <path d="M20.5899 22C20.5899 18.13 16.7399 15 11.9999 15C7.25991 15 3.40991 18.13 3.40991 22" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                     </svg>
                   </div>
-                  <h2 className="text-gradient">Meet Villa</h2>
+                  <h2 className="text-gradient">Meet Nico Villa</h2>
                 </div>
                 
                 {/* Photo moved here for mobile-first layout */}
