@@ -27,8 +27,15 @@ export async function POST(request: NextRequest) {
 
     console.log('🔵 Sending webhook data...');
     
-    // Send to webhook in background without waiting
-    sendWebhookData(webhookData);
+    // For Vercel, we need to handle the webhook call more carefully
+    // Try to send immediately, but don't block the response
+    try {
+      await sendWebhookData(webhookData);
+      console.log('✅ Webhook sent successfully');
+    } catch (webhookError) {
+      console.error('❌ Webhook failed, but continuing:', webhookError);
+      // Don't fail the entire request if webhook fails
+    }
 
     console.log('🔵 Returning success response');
     // Return success immediately
@@ -46,13 +53,14 @@ export async function POST(request: NextRequest) {
   }
 }
 
-// Separate function to handle webhook sending
+// Optimized function for Vercel serverless environment
 async function sendWebhookData(data: any) {
   console.log('🔵 Starting webhook send...');
   
   try {
+    // Reduced timeout for Vercel (8 seconds to be safe)
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
+    const timeoutId = setTimeout(() => controller.abort(), 8000);
 
     console.log('🔵 Making fetch request to:', WEBHOOK_URL);
     
@@ -63,7 +71,9 @@ async function sendWebhookData(data: any) {
         'User-Agent': 'Nics-Marketing-Quiz/1.0',
       },
       body: JSON.stringify(data),
-      signal: controller.signal
+      signal: controller.signal,
+      // Add keepalive for better connection handling
+      keepalive: true
     });
 
     clearTimeout(timeoutId);
@@ -75,13 +85,15 @@ async function sendWebhookData(data: any) {
     } else {
       const errorText = await response.text();
       console.error('❌ Webhook failed:', response.status, errorText);
+      throw new Error(`Webhook failed with status ${response.status}: ${errorText}`);
     }
   } catch (error: any) {
     if (error.name === 'AbortError') {
       console.error('⏰ Webhook timeout');
+      throw new Error('Webhook timeout');
     } else {
       console.error('❌ Webhook error:', error.message);
-      console.error('❌ Full error:', error);
+      throw error; // Re-throw to be handled by caller
     }
   }
 } 
