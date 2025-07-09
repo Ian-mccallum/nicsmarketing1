@@ -225,6 +225,8 @@ export default function QuizPage() {
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [showScrollTop, setShowScrollTop] = useState(false);
   const [emailError, setEmailError] = useState('');
+  const [showModal, setShowModal] = useState(true);
+  const [agreedToTerms, setAgreedToTerms] = useState(false);
 
   // Instant scroll to top function
   // Smooth scroll to top with better UX
@@ -391,6 +393,61 @@ export default function QuizPage() {
 
   const progress = ((currentStep + 1) / QUIZ_STEPS.length) * 100;
   const isHalfway = currentStep === 2; // Step 3 of 5 (0-indexed, so step 2)
+
+  const handleStartQuiz = () => {
+    if (agreedToTerms) {
+      setShowModal(false);
+    }
+  };
+
+  // Modal Component
+  const TermsModal = () => {
+    if (!showModal) return null;
+
+    return (
+      <div className="modal-overlay">
+        <div className="modal-content">
+          <div className="modal-header">
+            <img 
+              src="/nmlogo.png" 
+              alt="Nics Marketing" 
+              className="modal-logo"
+              onError={(e) => {
+                console.error('Logo failed to load');
+                e.currentTarget.style.display = 'none';
+              }}
+            />
+            <h2>Welcome to Your Qualification Assessment</h2>
+            <p>Before we begin, please review and agree to our terms.</p>
+          </div>
+          
+          <div className="modal-body">
+            <div className="terms-checkbox">
+              <label className="checkbox-option">
+                <input
+                  type="checkbox"
+                  checked={agreedToTerms}
+                  onChange={(e) => setAgreedToTerms(e.target.checked)}
+                />
+                <span className="checkmark"></span>
+                I agree to the <Link href="/policies" target="_blank" className="terms-link">Privacy Policy</Link> and <Link href="/terms" target="_blank" className="terms-link">Terms of Service</Link>
+              </label>
+            </div>
+          </div>
+          
+          <div className="modal-footer">
+            <button 
+              onClick={handleStartQuiz}
+              className="btn btn-primary btn-large"
+              disabled={!agreedToTerms}
+            >
+              Start Assessment
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  };
 
   // Points system for qualification
   const calculateQualificationScore = (data: QuizData) => {
@@ -1174,6 +1231,7 @@ export default function QuizPage() {
           </div>
         </div>
       </div>
+      <TermsModal />
     </div>
   );
 } 
