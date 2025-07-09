@@ -240,7 +240,7 @@ export default function QuizPage() {
     if (isCompleted) {
       // Small delay to ensure content is rendered
       setTimeout(() => {
-        scrollToTop();
+      scrollToTop();
       }, 100);
     }
   }, [isCompleted]);
@@ -250,7 +250,7 @@ export default function QuizPage() {
     if (currentStep >= 0) {
       // Small delay to ensure content is rendered
       setTimeout(() => {
-        scrollToTop();
+      scrollToTop();
       }, 100);
     }
     
@@ -318,7 +318,7 @@ export default function QuizPage() {
     if (currentStep < QUIZ_STEPS.length - 1) {
       setIsTransitioning(true);
       setTimeout(() => {
-        setCurrentStep(prev => prev + 1);
+      setCurrentStep(prev => prev + 1);
         setIsTransitioning(false);
         // Smooth scroll to top with delay for better UX
         setTimeout(() => {
@@ -332,6 +332,37 @@ export default function QuizPage() {
       setQualificationScore(score);
       setIsQualified(result.qualified);
       setIsCompleted(true);
+      
+      // Send quiz data to webhook in background (completely non-blocking)
+      const webhookData = {
+        ...quizData,
+        qualificationScore: score,
+        isQualified: result.qualified,
+        qualificationMessage: result.message,
+        nextSteps: result.nextSteps,
+        challengesArray: quizData.challenges, // Keep as array
+        challengesText: quizData.challenges.join(', '), // Also as comma-separated text
+        challengesCount: quizData.challenges.length // Number of challenges selected
+      };
+      
+      console.log('🟡 Challenges being sent:', quizData.challenges);
+      console.log('🟡 Challenges count:', quizData.challenges.length);
+      
+      fetch('/api/quiz-submission', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(webhookData)
+      }).then(response => {
+        console.log('🟡 API response status:', response.status);
+        return response.json();
+      }).then(data => {
+        console.log('🟡 API response data:', data);
+      }).catch((error) => {
+        console.error('🟡 API error:', error);
+      });
+      
       // Smooth scroll to top for results
       setTimeout(() => {
         scrollToTop();
@@ -343,7 +374,7 @@ export default function QuizPage() {
     if (currentStep > 0) {
       setIsTransitioning(true);
       setTimeout(() => {
-        setCurrentStep(prev => prev - 1);
+      setCurrentStep(prev => prev - 1);
         setIsTransitioning(false);
         // Smooth scroll to top with delay for better UX
         setTimeout(() => {
@@ -356,11 +387,28 @@ export default function QuizPage() {
   const handleSubmit = async () => {
     setIsSubmitting(true);
     
-    // Simulate API call
+    console.log('🟡 Quiz submit called');
+    console.log('🟡 Quiz data:', quizData);
+    
+    // Send quiz data to webhook in background (completely non-blocking)
+    fetch('/api/quiz-submission', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(quizData)
+    }).then(response => {
+      console.log('🟡 API response status:', response.status);
+      return response.json();
+    }).then(data => {
+      console.log('🟡 API response data:', data);
+    }).catch((error) => {
+      console.error('🟡 API error:', error);
+    });
+    
+    // Continue with normal flow immediately (no delay)
     setTimeout(() => {
       setIsSubmitting(false);
-      // Here you would typically send the data to your backend
-      console.log('Quiz data:', quizData);
     }, 1000);
   };
 
@@ -1058,8 +1106,8 @@ export default function QuizPage() {
                 Back to Home
               </Link>
             </div>
-                  </div>
-      </div>
+          </div>
+        </div>
       
       {/* Scroll to top button */}
       {showScrollTop && (
@@ -1073,9 +1121,9 @@ export default function QuizPage() {
           </svg>
         </button>
       )}
-    </div>
-  );
-}
+      </div>
+    );
+  }
 
   return (
     <div className="quiz-page">
