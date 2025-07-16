@@ -66,17 +66,19 @@ const REVENUE_OPTIONS = [
   "$500-$999", 
   "$1,000-$2,500",
   "$2,500-$5,000",
-  "$5,000+"
+  "$5,000-$10,000",
+  "$10,000-$20,000"
 ];
 
 const REVENUE_SELECT_OPTIONS = REVENUE_OPTIONS.map(option => ({ value: option, label: option }));
 
 const AD_SPEND_OPTIONS = [
-  "None",
   "$25-$150",
   "$150-$500",
   "$500-$1,000", 
-  "$1,000+"
+  "$1,000-$2,500",
+  "$2,500-$5,000",
+  "$5,000+"
 ];
 
 const AD_SPEND_SELECT_OPTIONS = AD_SPEND_OPTIONS.map(option => ({ value: option, label: option }));
@@ -451,8 +453,8 @@ export default function QuizPage() {
 
   // Points system for qualification
   const calculateQualificationScore = (data: QuizData) => {
-    // Auto-decline for high revenue businesses
-    if (data.currentRevenue === "$5,000+") {
+    // Auto-decline for low ad spend willingness
+    if (data.adSpend === "$25-$150") {
       return 0; // Auto-decline
     }
     
@@ -461,28 +463,29 @@ export default function QuizPage() {
     let adSpendScore = 0;
     let challengeScore = 0;
     
-    // Revenue scoring (0-100 points) - Sweet spot is $100-$1000
+    // Revenue scoring (0-100 points) - Higher is better, but lower is acceptable
     const revenueScores: { [key: string]: number } = {
-      "None": 85, // High potential, no existing revenue
-      "$100-$499": 100, // Perfect sweet spot
-      "$500-$999": 95, // Great fit
-      "$1,000-$2,500": 70, // Good but higher bar
-      "$2,500-$5,000": 40, // Selective - need strong other factors
-      "$5,000+": 0 // Auto-decline
+      "None": 60, // Acceptable - no existing revenue
+      "$100-$499": 70, // Good potential
+      "$500-$999": 80, // Better
+      "$1,000-$2,500": 85, // Good
+      "$2,500-$5,000": 90, // Very good
+      "$5,000-$10,000": 95, // Excellent
+      "$10,000-$20,000": 100 // Perfect
     };
     revenueScore = revenueScores[data.currentRevenue] || 0;
     
-    // Ad spend scoring (0-100 points) - Lower is better
+    // Ad spend scoring (0-100 points) - Higher is much better (most weight)
     const adSpendScores: { [key: string]: number } = {
-      "None": 100, // Perfect - no ad spend means room for growth
-      "$25-$150": 90, // Excellent - low ad spend
-      "$150-$500": 70, // Good - moderate ad spend
-      "$500-$1,000": 40, // Acceptable but higher bar
-      "$1,000+": 20 // Lower priority - already spending significantly
+      "$150-$500": 60, // Good willingness
+      "$500-$1,000": 75, // Strong willingness
+      "$1,000-$2,500": 85, // Very strong willingness
+      "$2,500-$5,000": 95, // Excellent willingness
+      "$5,000+": 100 // Perfect - maximum willingness
     };
     adSpendScore = adSpendScores[data.adSpend] || 0;
     
-    // Challenge scoring (0-100 points) - More challenges = better fit
+    // Challenge scoring (0-100 points) - More challenges = better fit (2nd weight)
     const challengeScores: { [key: string]: number } = {
       "Low conversion rates": 25, // High value challenge
       "Low traffic": 25, // High value challenge
@@ -511,32 +514,19 @@ export default function QuizPage() {
     
     challengeScore = Math.min(challengePoints * challengeMultiplier, 100);
     
-    // Calculate weighted base score (45% revenue, 25% ad spend, 30% challenges)
-    const baseScore = (revenueScore * 0.45) + (adSpendScore * 0.25) + (challengeScore * 0.30);
+    // Updated weights: Ad spend (50%), Challenges (30%), Revenue (20%)
+    const baseScore = (adSpendScore * 0.50) + (challengeScore * 0.30) + (revenueScore * 0.20);
     
-    // Apply ad spend multiplier (lower ad spend gets bonus)
-    let adSpendMultiplier = 1.0;
-    if (data.adSpend === "None") {
-      adSpendMultiplier = 1.3; // 30% bonus for no ad spend
-    } else if (data.adSpend === "$25-$150") {
-      adSpendMultiplier = 1.2; // 20% bonus for low ad spend
-    } else if (data.adSpend === "$150-$500") {
-      adSpendMultiplier = 1.1; // 10% bonus for moderate ad spend
-    }
-    
-    // Calculate final adjusted score
-    const adjustedScore = baseScore * adSpendMultiplier;
-    
-    return Math.min(adjustedScore, 100); // Cap at 100
+    return Math.min(baseScore, 100); // Cap at 100
   };
 
   const getQualificationResult = (score: number, businessName: string, personName: string, quizData: QuizData) => {
-    // Auto-decline for $5,000+ revenue
-    if (quizData.currentRevenue === "$5,000+") {
+    // Auto-decline for low ad spend willingness
+    if (quizData.adSpend === "$25-$150") {
       return {
         qualified: false,
-        message: `Thanks for your interest ${personName}, but ${businessName} appears to be too established for my services.`,
-        nextSteps: "I specialize in helping businesses scale from $100-$5,000 monthly revenue. Your business is already beyond this range.",
+        message: `Thanks for your interest ${personName}, but ${businessName} doesn't meet our minimum investment requirements.`,
+        nextSteps: "I require businesses to be willing to invest at least $150+ monthly in advertising to ensure we can achieve meaningful results.",
         services: null,
         painPointSolutions: null,
         revenueGuarantee: null,
@@ -544,16 +534,18 @@ export default function QuizPage() {
       };
     }
     
-    // Adaptive thresholds based on revenue and challenges
+    // Adaptive thresholds based on ad spend willingness and challenges
     let baseThreshold = 70; // Default threshold
     
-    // Adjust threshold based on revenue range
-    if (quizData.currentRevenue === "$100-$499" || quizData.currentRevenue === "$500-$999") {
-      baseThreshold = 60; // Lower threshold for sweet spot revenue
-    } else if (quizData.currentRevenue === "$1,000-$2,500") {
+    // Adjust threshold based on ad spend willingness
+    if (quizData.adSpend === "$2,500-$5,000" || quizData.adSpend === "$5,000+") {
+      baseThreshold = 60; // Lower threshold for high ad spend willingness
+    } else if (quizData.adSpend === "$1,000-$2,500") {
+      baseThreshold = 65; // Lower threshold for strong ad spend willingness
+    } else if (quizData.adSpend === "$500-$1,000") {
       baseThreshold = 70; // Standard threshold
-    } else if (quizData.currentRevenue === "$2,500-$5,000") {
-      baseThreshold = 80; // Higher threshold for higher revenue
+    } else {
+      baseThreshold = 75; // Higher threshold for moderate ad spend willingness
     }
     
     // Reduce threshold based on number of challenges (more challenges = easier to qualify)
@@ -563,7 +555,7 @@ export default function QuizPage() {
     if (score >= adjustedThreshold) {
       const services = getRecommendedServices(quizData);
       const painPointSolutions = getPainPointSolutions(quizData.challenges);
-      const revenueGuarantee = getRevenueGuarantee(quizData.currentRevenue);
+      const revenueGuarantee = getRevenueGuarantee(quizData.currentRevenue, quizData.adSpend);
       
       return {
         qualified: true,
@@ -576,7 +568,7 @@ export default function QuizPage() {
     } else if (score >= adjustedThreshold - 15) { // 15 point buffer for "maybe" category
       const services = getRecommendedServices(quizData);
       const painPointSolutions = getPainPointSolutions(quizData.challenges);
-      const revenueGuarantee = getLowerRevenueGuarantee(quizData.currentRevenue);
+      const revenueGuarantee = getLowerRevenueGuarantee(quizData.currentRevenue, quizData.adSpend);
       
       return {
         qualified: true,
@@ -590,7 +582,7 @@ export default function QuizPage() {
       return {
         qualified: false,
         message: `Thanks for your interest ${personName}, but I don't think ${businessName} and I are the right fit right now.`,
-        nextSteps: "I focus on businesses that are ready to scale and have the right foundation. However, I'm happy to answer any questions you might have.",
+        nextSteps: "I focus on businesses that are ready to invest in growth and have clear challenges to solve.",
         services: null,
         painPointSolutions: null,
         revenueGuarantee: null,
@@ -647,30 +639,55 @@ export default function QuizPage() {
     return challenges.map(challenge => solutions[challenge]).filter(Boolean);
   };
 
-  const getRevenueGuarantee = (currentRevenue: string) => {
-    const revenueMap: { [key: string]: string } = {
+  const getRevenueGuarantee = (currentRevenue: string, adSpend: string) => {
+    const baseGuarantees: { [key: string]: string } = {
       "None": "$2,000+ monthly within 90 days",
       "$100-$499": "$1,500+ monthly within 60 days",
       "$500-$999": "$2,500+ monthly within 60 days",
       "$1,000-$2,500": "$4,000+ monthly within 90 days",
       "$2,500-$5,000": "$7,500+ monthly within 90 days",
-      "$5,000+": "$10,000+ monthly within 90 days"
+      "$5,000-$10,000": "$12,000+ monthly within 90 days",
+      "$10,000-$20,000": "$20,000+ monthly within 90 days"
     };
     
-    return revenueMap[currentRevenue] || "Significant revenue increase within 90 days";
+    // Boost guarantees based on ad spend willingness
+    const adSpendBoost: { [key: string]: string } = {
+      "$150-$500": " (with moderate ad spend)",
+      "$500-$1,000": " (with strong ad spend)",
+      "$1,000-$2,500": " (with aggressive ad spend)",
+      "$2,500-$5,000": " (with maximum ad spend)",
+      "$5,000+": " (with unlimited ad spend)"
+    };
+    
+    const baseGuarantee = baseGuarantees[currentRevenue] || "Significant revenue increase within 90 days";
+    const boost = adSpendBoost[adSpend] || "";
+    
+    return baseGuarantee + boost;
   };
 
-  const getLowerRevenueGuarantee = (currentRevenue: string) => {
-    const revenueMap: { [key: string]: string } = {
+  const getLowerRevenueGuarantee = (currentRevenue: string, adSpend: string) => {
+    const baseGuarantees: { [key: string]: string } = {
       "None": "$1,000+ monthly within 60 days",
       "$100-$499": "$750+ monthly within 30 days",
       "$500-$999": "$1,250+ monthly within 30 days",
       "$1,000-$2,500": "$2,000+ monthly within 60 days",
       "$2,500-$5,000": "$5,000+ monthly within 60 days",
-      "$5,000+": "$7,500+ monthly within 60 days"
+      "$5,000-$10,000": "$8,000+ monthly within 60 days",
+      "$10,000-$20,000": "$15,000+ monthly within 60 days"
     };
     
-    return revenueMap[currentRevenue] || "Significant revenue increase within 60 days";
+    const adSpendBoost: { [key: string]: string } = {
+      "$150-$500": " (with moderate ad spend)",
+      "$500-$1,000": " (with strong ad spend)",
+      "$1,000-$2,500": " (with aggressive ad spend)",
+      "$2,500-$5,000": " (with maximum ad spend)",
+      "$5,000+": " (with unlimited ad spend)"
+    };
+    
+    const baseGuarantee = baseGuarantees[currentRevenue] || "Significant revenue increase within 60 days";
+    const boost = adSpendBoost[adSpend] || "";
+    
+    return baseGuarantee + boost;
   };
 
   const renderStepContent = () => {
@@ -847,7 +864,7 @@ export default function QuizPage() {
             </div>
 
             <div className="form-group">
-              <label htmlFor="adSpend">What's your current monthly ad spend? *</label>
+              <label htmlFor="adSpend">How much are you willing to spend on ads monthly? *</label>
               <Select
                 inputId="adSpend"
                 options={AD_SPEND_SELECT_OPTIONS}
@@ -878,6 +895,31 @@ export default function QuizPage() {
                     color: '#111',
                     fontSize: '1rem',
                     fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
+                    maxHeight: '200px', // Set maximum height
+                    zIndex: 9999, // Ensure it appears above other elements
+                    position: 'absolute' as const,
+                    width: '100%',
+                    overflow: 'hidden', // Hide overflow on container
+                  }),
+                  menuList: (provided) => ({
+                    ...provided,
+                    maxHeight: '200px', // Set maximum height for scrollable area
+                    overflowY: 'auto', // Enable vertical scrolling
+                    scrollbarWidth: 'thin', // For Firefox
+                    '&::-webkit-scrollbar': {
+                      width: '8px',
+                    },
+                    '&::-webkit-scrollbar-track': {
+                      background: '#f1f1f1',
+                      borderRadius: '4px',
+                    },
+                    '&::-webkit-scrollbar-thumb': {
+                      background: '#c1c1c1',
+                      borderRadius: '4px',
+                    },
+                    '&::-webkit-scrollbar-thumb:hover': {
+                      background: '#a8a8a8',
+                    },
                   }),
                   option: (provided, state) => ({
                     ...provided,
@@ -885,6 +927,11 @@ export default function QuizPage() {
                     backgroundColor: state.isFocused ? '#eee' : '#fff',
                     fontSize: '1rem',
                     fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
+                    padding: '12px 16px', // Add more padding for better touch targets
+                    cursor: 'pointer',
+                    '&:hover': {
+                      backgroundColor: '#f5f5f5',
+                    },
                   }),
                   placeholder: (provided) => ({
                     ...provided,
