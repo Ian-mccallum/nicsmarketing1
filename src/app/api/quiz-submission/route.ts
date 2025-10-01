@@ -18,7 +18,7 @@ export async function POST(request: NextRequest) {
     // Try to send immediately, but don't block the response
     try {
       await sendWebhookData(webhookData);
-    } catch (webhookError) {
+    } catch {
       // Don't fail the entire request if webhook fails
     }
 
@@ -28,7 +28,7 @@ export async function POST(request: NextRequest) {
       message: 'Quiz submitted successfully' 
     });
 
-  } catch (error) {
+  } catch {
     return NextResponse.json(
       { success: false, message: 'Failed to submit quiz' },
       { status: 500 }
@@ -37,7 +37,7 @@ export async function POST(request: NextRequest) {
 }
 
 // Optimized function for Vercel serverless environment
-async function sendWebhookData(data: any) {
+async function sendWebhookData(data: unknown) {
   try {
     // Reduced timeout for Vercel (8 seconds to be safe)
     const controller = new AbortController();
@@ -61,8 +61,8 @@ async function sendWebhookData(data: any) {
       const errorText = await response.text();
       throw new Error(`Webhook failed with status ${response.status}: ${errorText}`);
     }
-  } catch (error: any) {
-    if (error.name === 'AbortError') {
+  } catch (error: unknown) {
+    if (error instanceof Error && error.name === 'AbortError') {
       throw new Error('Webhook timeout');
     } else {
       throw error; // Re-throw to be handled by caller
